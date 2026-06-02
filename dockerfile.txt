@@ -1,0 +1,35 @@
+# 1. Usamos la imagen oficial de PHP con Apache
+FROM php:8.2-apache
+
+# 2. Instalar dependencias del sistema necesarias para MongoDB y PostgreSQL
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    libpq-dev \
+    git \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Instalar las extensiones nativas de PHP (como la de PostgreSQL)
+RUN docker-php-ext-install pdo pdo_pgsql
+
+# 4. Instalar la extensión de MongoDB mediante PECL y habilitarla
+RUN pecl install mongodb && docker-php-ext-enable mongodb
+
+# 5. Habilitar el módulo rewrite de Apache (por si acaso)
+RUN a2enmod rewrite
+
+# 6. Instalar Composer de forma oficial dentro del contenedor
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# 7. Copiar todos los archivos de tu proyecto al servidor de Apache
+COPY . /var/www/html/
+
+# 8. Darle permisos correctos a la carpeta del servidor
+RUN chown -R www-data:www-data /var/www/html
+
+# 9. Ejecutar Composer para instalar la librería de MongoDB Atlas
+WORKDIR /var/www/html
+RUN composer install --no-interaction --optimize-autoloader
+
+# 10. Exponer el puerto 80 para que Render pueda redirigir el tráfico web
+EXPOSE 80
