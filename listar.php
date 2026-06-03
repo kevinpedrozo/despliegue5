@@ -1,6 +1,6 @@
 <?php
 
-$archivo = "data/estudiantes.json";
+$archivo = "estudiantes.json";
 
 if(!file_exists($archivo))
 {
