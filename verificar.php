@@ -1,12 +1,12 @@
 <?php
 
 $estudiantes = json_decode(
-file_get_contents("data/estudiantes.json"),
+file_get_contents("estudiantes.json"),
 true
 );
 
 $documentos = json_decode(
-file_get_contents("data/documentos.json"),
+file_get_contents("documentos.json"),
 true
 );
 
