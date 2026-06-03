@@ -3,7 +3,7 @@
 $estudiantes = [];
 $documentos = [];
 
-if(file_exists("data/estudiantes.json"))
+if(file_exists("estudiantes.json"))
 {
     $estudiantes = json_decode(
     file_get_contents(
@@ -13,7 +13,7 @@ if(file_exists("data/estudiantes.json"))
     );
 }
 
-if(file_exists("data/documentos.json"))
+if(file_exists("documentos.json"))
 {
     $documentos = json_decode(
     file_get_contents(
