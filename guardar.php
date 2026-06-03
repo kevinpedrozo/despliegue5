@@ -56,8 +56,8 @@ if (!file_exists("uploads"))
     mkdir("uploads", 0777, true);
 }
 
-$estudiantesFile = "data/estudiantes.json";
-$documentosFile = "data/documentos.json";
+$estudiantesFile = "estudiantes.json";
+$documentosFile = "documentos.json";
 
 if (!file_exists($estudiantesFile))
 {
