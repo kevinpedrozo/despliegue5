@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$archivo = sys_get_temp_dir() . "/estudiantes.json";
+$archivo = __DIR__ . "/estudiantes.json";
 
 if (!file_exists($archivo)) {
     file_put_contents($archivo, "[]");
