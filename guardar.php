@@ -13,58 +13,20 @@ $nombre = trim($_POST["nombre"] ?? "");
 $documento = trim($_POST["documento"] ?? "");
 $correo = trim($_POST["correo"] ?? "");
 
-if (
-    empty($nombre) ||
-    empty($documento) ||
-    empty($correo)
-)
+if(empty($nombre) || empty($documento) || empty($correo))
 {
-    die("
-    <h2 style='color:red'>
-    ❌ Todos los campos son obligatorios
-    </h2>
-    <a href='index.php'>Volver</a>
-    ");
+    die("❌ Todos los campos son obligatorios");
 }
 
-if (!isset($_FILES["archivo"]))
-{
-    die("
-    <h2 style='color:red'>
-    ❌ No se recibió ningún archivo
-    </h2>
-    ");
-}
+$estudiantesFile = __DIR__ . "/estudiantes.json";
+$documentosFile = __DIR__ . "/documentos.json";
 
-if ($_FILES["archivo"]["error"] != 0)
-{
-    die("
-    <h2 style='color:red'>
-    ❌ Error al cargar archivo
-    </h2>
-    <pre>" . print_r($_FILES, true) . "</pre>
-    ");
-}
-
-if (!file_exists("data"))
-{
-    mkdir("data", 0777, true);
-}
-
-if (!file_exists("uploads"))
-{
-    mkdir("uploads", 0777, true);
-}
-
-$estudiantesFile = "estudiantes.json";
-$documentosFile = "documentos.json";
-
-if (!file_exists($estudiantesFile))
+if(!file_exists($estudiantesFile))
 {
     file_put_contents($estudiantesFile, "[]");
 }
 
-if (!file_exists($documentosFile))
+if(!file_exists($documentosFile))
 {
     file_put_contents($documentosFile, "[]");
 }
@@ -74,60 +36,44 @@ $estudiantes = json_decode(
     true
 );
 
-if (!$estudiantes)
+if(!is_array($estudiantes))
 {
     $estudiantes = [];
 }
 
-foreach ($estudiantes as $e)
+foreach($estudiantes as $e)
 {
-    if ($e["documento"] == $documento)
+    if($e["documento"] == $documento)
     {
         die("
-        <h2 style='color:red'>
-        ❌ Ya existe un estudiante con ese documento
-        </h2>
-
-        <a href='index.php'>
-        Volver
-        </a>
+        <h2>❌ El estudiante ya existe</h2>
+        <a href='index.php'>Volver</a>
         ");
     }
 }
 
-$nombreArchivo = basename($_FILES["archivo"]["name"]);
-
-$rutaArchivo =
-"uploads/" .
-time() .
-"_" .
-$nombreArchivo;
-
-$subida = move_uploaded_file(
-    $_FILES["archivo"]["tmp_name"],
-    $rutaArchivo
-);
-
-if (!$subida)
+if(!file_exists(__DIR__ . "/uploads"))
 {
-    die("
-    <h2 style='color:red'>
-    ❌ Error al mover archivo al servidor
-    </h2>
-
-    <h3>Información de depuración:</h3>
-
-    <pre>
-    " . print_r($_FILES, true) . "
-    </pre>
-
-    <p>
-    Verifica que exista la carpeta uploads.
-    </p>
-    ");
+    mkdir(__DIR__ . "/uploads", 0777, true);
 }
 
-$nuevoEstudiante = [
+$nombreArchivo =
+time() . "_" .
+basename($_FILES["archivo"]["name"]);
+
+$rutaFisica =
+__DIR__ . "/uploads/" .
+$nombreArchivo;
+
+if(!move_uploaded_file(
+    $_FILES["archivo"]["tmp_name"],
+    $rutaFisica
+))
+{
+    die("❌ Error al subir archivo");
+}
+
+$estudiantes[] = [
 
     "nombre" => $nombre,
     "documento" => $documento,
@@ -135,8 +81,6 @@ $nuevoEstudiante = [
     "fecha" => date("Y-m-d H:i:s")
 
 ];
-
-$estudiantes[] = $nuevoEstudiante;
 
 $resultadoEstudiantes = file_put_contents(
     $estudiantesFile,
@@ -151,7 +95,7 @@ $documentos = json_decode(
     true
 );
 
-if (!$documentos)
+if(!is_array($documentos))
 {
     $documentos = [];
 }
@@ -159,7 +103,7 @@ if (!$documentos)
 $documentos[] = [
 
     "documento" => $documento,
-    "archivo" => $rutaArchivo
+    "archivo" => $nombreArchivo
 
 ];
 
@@ -177,72 +121,30 @@ $resultadoDocumentos = file_put_contents(
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Registro Exitoso</title>
+<title>Registro</title>
 </head>
 
 <body>
 
-<h1 style="color:green">
-✅ Registro completado
-</h1>
+<h1>✅ Registro completado</h1>
 
-<p>
-Nombre:
-<b><?php echo htmlspecialchars($nombre); ?></b>
-</p>
-
-<p>
-Documento:
-<b><?php echo htmlspecialchars($documento); ?></b>
-</p>
-
-<p>
-Correo:
-<b><?php echo htmlspecialchars($correo); ?></b>
-</p>
-
-<p>
-Archivo:
-<b><?php echo htmlspecialchars($rutaArchivo); ?></b>
-</p>
+<p><b>Nombre:</b> <?= htmlspecialchars($nombre) ?></p>
+<p><b>Documento:</b> <?= htmlspecialchars($documento) ?></p>
+<p><b>Correo:</b> <?= htmlspecialchars($correo) ?></p>
 
 <hr>
 
-<h2>Verificación de almacenamiento</h2>
+<p>
+<?= $resultadoEstudiantes !== false ? "✅ estudiantes.json actualizado" : "❌ Error estudiantes.json"; ?>
+</p>
 
-<ul>
-
-<li>
-<?php
-echo $resultadoEstudiantes !== false
-? "✅ estudiantes.json actualizado"
-: "❌ Error estudiantes.json";
-?>
-</li>
-
-<li>
-<?php
-echo $resultadoDocumentos !== false
-? "✅ documentos.json actualizado"
-: "❌ Error documentos.json";
-?>
-</li>
-
-<li>
-<?php
-echo file_exists($rutaArchivo)
-? "✅ Archivo almacenado"
-: "❌ Archivo no encontrado";
-?>
-</li>
-
-</ul>
+<p>
+<?= $resultadoDocumentos !== false ? "✅ documentos.json actualizado" : "❌ Error documentos.json"; ?>
+</p>
 
 <br>
 
-<a href="index.php">
-🏠 Volver al inicio
-</a>
+<a href="index.php">🏠 Volver al inicio</a>
 
 </body>
 </html>
