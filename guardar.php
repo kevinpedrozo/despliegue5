@@ -18,8 +18,16 @@ if(empty($nombre) || empty($documento) || empty($correo))
     die("❌ Todos los campos son obligatorios");
 }
 
-$estudiantesFile = __DIR__ . "/estudiantes.json";
-$documentosFile = __DIR__ . "/documentos.json";
+$estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
+$documentosFile = sys_get_temp_dir() . "/documentos.json";
+
+if (!file_exists($estudiantesFile)) {
+    file_put_contents($estudiantesFile, "[]");
+}
+
+if (!file_exists($documentosFile)) {
+    file_put_contents($documentosFile, "[]");
+}
 
 if(!file_exists($estudiantesFile))
 {
