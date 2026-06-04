@@ -1,7 +1,7 @@
 <?php
 
-$archivoEstudiantes = __DIR__ . "/estudiantes.json";
-$archivoDocumentos  = __DIR__ . "/documentos.json";
+$archivoEstudiantes = sys_get_temp_dir() . "/estudiantes.json";
+$archivoDocumentos  = sys_get_temp_dir() . "/documentos.json";
 
 if (!file_exists($archivoEstudiantes)) {
     file_put_contents($archivoEstudiantes, "[]");
