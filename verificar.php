@@ -1,14 +1,15 @@
 <?php
 
-$estudiantes = json_decode(
-file_get_contents("estudiantes.json"),
-true
-);
+$estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
+$documentosFile = sys_get_temp_dir() . "/documentos.json";
 
-$documentos = json_decode(
-file_get_contents("documentos.json"),
-true
-);
+if (!file_exists($estudiantesFile)) {
+    file_put_contents($estudiantesFile, "[]");
+}
+
+if (!file_exists($documentosFile)) {
+    file_put_contents($documentosFile, "[]");
+}
 
 ?>
 
