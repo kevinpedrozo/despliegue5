@@ -13,9 +13,13 @@ $nombre = trim($_POST["nombre"] ?? "");
 $documento = trim($_POST["documento"] ?? "");
 $correo = trim($_POST["correo"] ?? "");
 
+// Estilo base reutilizable para los errores críticos
+$estiloError = "font-family:system-ui, sans-serif; max-width:500px; margin:50px auto; padding:30px; background:#fef2f2; border:1px solid #fca5a5; color:#991b1b; border-radius:16px; text-align:center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);";
+$estiloBotonError = "display:inline-block; margin-top:20px; padding:10px 20px; background:#991b1b; color:white; text-decoration:none; border-radius:8px; font-weight:600;";
+
 if(empty($nombre) || empty($documento) || empty($correo))
 {
-    die("❌ Todos los campos son obligatorios");
+    die("<div style='{$estiloError}'><h2>❌ Todos los campos son obligatorios</h2><a href='index.php' style='{$estiloBotonError}'>Volver</a></div>");
 }
 
 $estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
@@ -54,8 +58,10 @@ foreach($estudiantes as $e)
     if($e["documento"] == $documento)
     {
         die("
-        <h2>❌ El estudiante ya existe</h2>
-        <a href='index.php'>Volver</a>
+        <div style='{$estiloError}'>
+            <h2>❌ El estudiante ya existe</h2>
+            <a href='index.php' style='{$estiloBotonError}'>Volver al Inicio</a>
+        </div>
         ");
     }
 }
@@ -78,7 +84,7 @@ if(!move_uploaded_file(
     $rutaFisica
 ))
 {
-    die("❌ Error al subir archivo");
+    die("<div style='{$estiloError}'><h2>❌ Error al subir archivo</h2><a href='index.php' style='{$estiloBotonError}'>Volver</a></div>");
 }
 
 $estudiantes[] = [
@@ -129,30 +135,156 @@ $resultadoDocumentos = file_put_contents(
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Registro</title>
+<title>Registro Exitoso</title>
+
+<style>
+/* --- Ajustes Globales --- */
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 40px 20px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* --- Contenedor Principal --- */
+.container {
+    width: 100%;
+    max-width: 550px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* --- Encabezado de Éxito --- */
+.success-header {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+}
+
+.success-header h1 {
+    color: #16a34a;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* --- Lista de Detalles del Estudiante --- */
+.details-box {
+    text-align: left;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+
+.details-box p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #334155;
+}
+
+.details-box p b {
+    color: #0f172a;
+    display: inline-block;
+    width: 100px;
+}
+
+/* --- Separador --- */
+hr {
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 24px 0;
+}
+
+/* --- Badges / Etiquetas de Estado --- */
+.status-badge {
+    display: block;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.status-ok {
+    background-color: #f0fdf4;
+    color: #166534;
+}
+
+.status-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+/* --- Botón Volver --- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: #f1f5f9;
+    color: #334155;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid #cbd5e1;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 16px;
+}
+
+.btn-back:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+</style>
+
 </head>
 
 <body>
 
-<h1>✅ Registro completado</h1>
+<div class="container">
 
-<p><b>Nombre:</b> <?= htmlspecialchars($nombre) ?></p>
-<p><b>Documento:</b> <?= htmlspecialchars($documento) ?></p>
-<p><b>Correo:</b> <?= htmlspecialchars($correo) ?></p>
+    <div class="success-header">
+        <h1>✅ Registro Completado con Éxito</h1>
+    </div>
 
-<hr>
+    <div class="details-box">
+        <p><b>Nombre:</b> <?= htmlspecialchars($nombre) ?></p>
+        <p><b>Documento:</b> <?= htmlspecialchars($documento) ?></p>
+        <p><b>Correo:</b> <?= htmlspecialchars($correo) ?></p>
+    </div>
 
-<p>
-<?= $resultadoEstudiantes !== false ? "✅ estudiante registrado" : "❌ Error estudiante"; ?>
-</p>
+    <hr>
 
-<p>
-<?= $resultadoDocumentos !== false ? "✅ documento registrado" : "❌ Error documento"; ?>
-</p>
+    <div class="status-badge <?= $resultadoEstudiantes !== false ? 'status-ok' : 'status-error'; ?>">
+        <?= $resultadoEstudiantes !== false ? "✅ Base de estudiantes actualizada correctamente" : "❌ Error al guardar datos del estudiante"; ?>
+    </div>
 
-<br>
+    <div class="status-badge <?= $resultadoDocumentos !== false ? 'status-ok' : 'status-error'; ?>">
+        <?= $resultadoDocumentos !== false ? "✅ Base de documentos actualizada correctamente" : "❌ Error al guardar datos del documento"; ?>
+    </div>
 
-<a href="index.php">🏠 Volver al inicio</a>
+    <a href="index.php" class="btn-back">🏠 Volver al Inicio</a>
+
+</div>
 
 </body>
 </html>
