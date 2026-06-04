@@ -22,16 +22,24 @@ if(empty($nombre) || empty($documento) || empty($correo))
     die("<div style='{$estiloError}'><h2>❌ Todos los campos son obligatorios</h2><a href='index.php' style='{$estiloBotonError}'>Volver</a></div>");
 }
 
-// Se definen las rutas correctas apuntando a la raíz del proyecto
-$estudiantesFile = __DIR__ . "/estudiantes.json";
-$documentosFile = __DIR__ . "/documentos.json";
+$estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
+$documentosFile = sys_get_temp_dir() . "/documentos.json";
 
-// Se verifica una sola vez que existan los archivos JSON
 if (!file_exists($estudiantesFile)) {
     file_put_contents($estudiantesFile, "[]");
 }
 
 if (!file_exists($documentosFile)) {
+    file_put_contents($documentosFile, "[]");
+}
+
+if(!file_exists($estudiantesFile))
+{
+    file_put_contents($estudiantesFile, "[]");
+}
+
+if(!file_exists($documentosFile))
+{
     file_put_contents($documentosFile, "[]");
 }
 
@@ -80,10 +88,12 @@ if(!move_uploaded_file(
 }
 
 $estudiantes[] = [
+
     "nombre" => $nombre,
     "documento" => $documento,
     "correo" => $correo,
     "fecha" => date("Y-m-d H:i:s")
+
 ];
 
 $resultadoEstudiantes = file_put_contents(
@@ -105,8 +115,10 @@ if(!is_array($documentos))
 }
 
 $documentos[] = [
+
     "documento" => $documento,
     "archivo" => $nombreArchivo
+
 ];
 
 $resultadoDocumentos = file_put_contents(
