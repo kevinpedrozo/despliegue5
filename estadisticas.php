@@ -3,26 +3,51 @@
 $estudiantes = [];
 $documentos = [];
 
-if(file_exists("estudiantes.json"))
+$archivoEstudiantes =
+sys_get_temp_dir() . "/estudiantes.json";
+
+$archivoDocumentos =
+sys_get_temp_dir() . "/documentos.json";
+
+if(!file_exists($archivoEstudiantes))
 {
-    $estudiantes = json_decode(
-    file_get_contents(
-    "estudiantes.json"
-    ),
-    true
+    file_put_contents(
+    $archivoEstudiantes,
+    "[]"
     );
 }
 
-if(file_exists("documentos.json"))
+if(!file_exists($archivoDocumentos))
 {
-    $documentos = json_decode(
-    file_get_contents(
-    "documentos.json"
-    ),
-    true
+    file_put_contents(
+    $archivoDocumentos,
+    "[]"
     );
 }
 
+$estudiantes = json_decode(
+    file_get_contents(
+    $archivoEstudiantes
+    ),
+    true
+);
+
+$documentos = json_decode(
+    file_get_contents(
+    $archivoDocumentos
+    ),
+    true
+);
+
+if(!is_array($estudiantes))
+{
+    $estudiantes = [];
+}
+
+if(!is_array($documentos))
+{
+    $documentos = [];
+}
 $totalEstudiantes = count($estudiantes);
 $totalDocumentos = count($documentos);
 
