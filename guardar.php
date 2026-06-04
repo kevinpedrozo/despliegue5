@@ -143,11 +143,11 @@ $resultadoDocumentos = file_put_contents(
 <hr>
 
 <p>
-<?= $resultadoEstudiantes !== false ? "✅ estudiantes.json actualizado" : "❌ Error estudiantes.json"; ?>
+<?= $resultadoEstudiantes !== false ? "✅ estudiante registrado" : "❌ Error estudiante"; ?>
 </p>
 
 <p>
-<?= $resultadoDocumentos !== false ? "✅ documentos.json actualizado" : "❌ Error documentos.json"; ?>
+<?= $resultadoDocumentos !== false ? "✅ documento registrado" : "❌ Error documento"; ?>
 </p>
 
 <br>
