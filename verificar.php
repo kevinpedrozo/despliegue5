@@ -1,180 +1,119 @@
 <?php
 
-$estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
-$documentosFile = sys_get_temp_dir() . "/documentos.json";
+$archivoEstudiantes = sys_get_temp_dir() . "/estudiantes.json";
+$archivoDocumentos  = sys_get_temp_dir() . "/documentos.json";
 
-if (!file_exists($estudiantesFile)) {
-    file_put_contents($estudiantesFile, "[]");
+if (!file_exists($archivoEstudiantes)) {
+    file_put_contents($archivoEstudiantes, "[]");
 }
 
-if (!file_exists($documentosFile)) {
-    file_put_contents($documentosFile, "[]");
+if (!file_exists($archivoDocumentos)) {
+    file_put_contents($archivoDocumentos, "[]");
 }
+
+$estudiantes = json_decode(file_get_contents($archivoEstudiantes), true) ?? [];
+$documentos  = json_decode(file_get_contents($archivoDocumentos), true) ?? [];
+
+if (!is_array($estudiantes)) { $estudiantes = []; }
+if (!is_array($documentos))  { $documentos = []; }
+
+// OPTIMIZACIÓN: Creamos un array rápido solo con los números de documento cargados
+// Esto funciona como un índice de base de datos en memoria.
+$documentosCargados = array_column($documentos, 'documento');
 
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-<meta charset="UTF-8">
-<title>Verificación</title>
-
-<style>
-/* --- Ajustes Globales --- */
-body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: #f8fafc;
-    color: #1e293b;
-    padding: 40px 20px;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    box-sizing: border-box;
-}
-
-/* --- Contenedor Principal --- */
-.container {
-    width: 100%;
-    max-width: 600px;
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Título --- */
-h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #0f172a;
-    margin-top: 0;
-    margin-bottom: 24px;
-    text-align: center;
-}
-
-/* --- Grupo de Resultados --- */
-.results-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 28px;
-}
-
-/* --- Cajas de Estado (Alertas) --- */
-.status-card {
-    padding: 14px 18px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    border: 1px solid transparent;
-}
-
-.status-success {
-    background-color: #f0fdf4;
-    border-color: #bbf7d0;
-    color: #166534;
-}
-
-.status-danger {
-    background-color: #fef2f2;
-    border-color: #fca5a5;
-    color: #991b1b;
-}
-
-/* --- Botón Volver --- */
-.btn-back {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    background: #f1f5f9;
-    color: #334155;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    border: 1px solid #cbd5e1;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-}
-
-.btn-back:hover {
-    background: #e2e8f0;
-    color: #0f172a;
-    transform: translateY(-1px);
-}
-
-.btn-back:active {
-    transform: translateY(0);
-}
-</style>
-
+    <meta charset="UTF-8">
+    <title>Verificación de Registros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: bold;
+        }
+        .correcto {
+            color: #166534;
+            font-weight: bold;
+            background-color: #f0fdf4;
+        }
+        .error {
+            color: #991b1b;
+            font-weight: bold;
+            background-color: #fef2f2;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        .btn-back:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <h1>🔍 Verificación de Estudiantes</h1>
 
-<h1>🔍 Verificación de Almacenamiento</h1>
+    <?php if (count($estudiantes) === 0): ?>
+        <h3>No hay estudiantes registrados.</h3>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Documento</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($estudiantes as $e): ?>
+                    <?php 
+                        // En lugar de recorrer todos los documentos uno a uno, 
+                        // preguntamos directamente si el documento existe en nuestro índice.
+                        $encontrado = in_array($e["documento"], $documentosCargados); 
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($e["nombre"]) ?></td>
+                        <td><?= htmlspecialchars($e["documento"]) ?></td>
+                        <td><?= htmlspecialchars($e["correo"]) ?></td>
+                        <?php if ($encontrado): ?>
+                            <td class="correcto">✅ Documento cargado</td>
+                        <?php else: ?>
+                            <td class="error">❌ Sin documento</td>
+                        <?php endif; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
-<div class="results-group">
-<?php
-
-foreach($estudiantes as $e)
-{
-    $existe = false;
-
-    foreach($documentos as $d)
-    {
-        if(
-        $e["documento"] ==
-        $d["documento"]
-        )
-        {
-            $existe = true;
-            break;
-        }
-    }
-
-    if($existe)
-    {
-        // Caja de éxito mejorada con CSS moderno
-        echo "
-        <div class='status-card status-success'>
-            ✅ {$e['nombre']} almacenado en ambos soportes
-        </div>
-        ";
-    }
-    else
-    {
-        // Caja de error mejorada con CSS moderno
-        echo "
-        <div class='status-card status-danger'>
-            ❌ {$e['nombre']} NO fue almacenado correctamente
-        </div>
-        ";
-    }
-}
-
-?>
-</div>
-
-<a href="index.php" class="btn-back">
-    🏠 Volver al Inicio
-</a>
-
-</div>
-
-</body>
-</html>
-</a>
+    <a href="index.php" class="btn-back">
+        Anclaje 🏠 Volver al Inicio
+    </a>
 
 </body>
 </html>
