@@ -3,11 +3,8 @@
 $estudiantes = [];
 $documentos = [];
 
-$archivoEstudiantes =
-sys_get_temp_dir() . "/estudiantes.json";
-
-$archivoDocumentos =
-sys_get_temp_dir() . "/documentos.json";
+$archivoEstudiantes = __DIR__ . "/estudiantes.json";
+$archivoDocumentos = __DIR__ . "/documentos.json";
 
 if(!file_exists($archivoEstudiantes))
 {
