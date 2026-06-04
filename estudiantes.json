@@ -1,0 +1,20 @@
+[
+    {
+        "nombre": "Carlos Mendoza",
+        "documento": "10203040",
+        "correo": "carlos.mendoza@email.com",
+        "fecha": "2026-06-01 09:30:00"
+    },
+    {
+        "nombre": "Ana Maria Restrepo",
+        "documento": "50607080",
+        "correo": "ana.restrepo@email.com",
+        "fecha": "2026-06-02 14:15:22"
+    },
+    {
+        "nombre": "Laura Sofia Gomez",
+        "documento": "90807060",
+        "correo": "laura.gomez@email.com",
+        "fecha": "2026-06-03 11:05:40"
+    }
+]
