@@ -22,25 +22,48 @@ if(empty($nombre) || empty($documento) || empty($correo))
     die("<div style='{$estiloError}'><h2>❌ Todos los campos son obligatorios</h2><a href='index.php' style='{$estiloBotonError}'>Volver</a></div>");
 }
 
+// Se definen las rutas correctas apuntando a la carpeta temporal (evita el Permission Denied)
 $estudiantesFile = sys_get_temp_dir() . "/estudiantes.json";
 $documentosFile = sys_get_temp_dir() . "/documentos.json";
 
-if (!file_exists($estudiantesFile)) {
-    file_put_contents($estudiantesFile, "[]");
+// Si el archivo de estudiantes no existe o está vacío, creamos los registros iniciales
+if (!file_exists($estudiantesFile) || empty(file_get_contents($estudiantesFile)) || file_get_contents($estudiantesFile) === "[]") {
+    $datosInicialesEstudiantes = [
+        [
+            "nombre" => "Carlos Mendoza",
+            "documento" => "10203040",
+            "correo" => "carlos.mendoza@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ],
+        [
+            "nombre" => "Ana Maria Restrepo",
+            "documento" => "50607080",
+            "correo" => "ana.restrepo@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ],
+        [
+            "nombre" => "Laura Sofia Gomez",
+            "documento" => "90807060",
+            "correo" => "laura.gomez@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ]
+    ];
+    file_put_contents($estudiantesFile, json_encode($datosInicialesEstudiantes, JSON_PRETTY_PRINT));
 }
 
-if (!file_exists($documentosFile)) {
-    file_put_contents($documentosFile, "[]");
-}
-
-if(!file_exists($estudiantesFile))
-{
-    file_put_contents($estudiantesFile, "[]");
-}
-
-if(!file_exists($documentosFile))
-{
-    file_put_contents($documentosFile, "[]");
+// Si el archivo de documentos no existe o está vacío, creamos los registros iniciales
+if (!file_exists($documentosFile) || empty(file_get_contents($documentosFile)) || file_get_contents($documentosFile) === "[]") {
+    $datosInicialesDocumentos = [
+        [
+            "documento" => "10203040",
+            "archivo" => "1717400000_documento_carlos.pdf"
+        ],
+        [
+            "documento" => "50607080",
+            "archivo" => "1717411111_documento_ana.pdf"
+        ]
+    ];
+    file_put_contents($documentosFile, json_encode($datosInicialesDocumentos, JSON_PRETTY_PRINT));
 }
 
 $estudiantes = json_decode(
@@ -66,9 +89,11 @@ foreach($estudiantes as $e)
     }
 }
 
-if(!file_exists(__DIR__ . "/uploads"))
+// Carpeta de subidas dentro de la carpeta temporal para evitar bloqueos de permisos en Render
+$subidasCarpeta = sys_get_temp_dir() . "/uploads";
+if(!file_exists($subidasCarpeta))
 {
-    mkdir(__DIR__ . "/uploads", 0777, true);
+    mkdir($subidasCarpeta, 0777, true);
 }
 
 $nombreArchivo =
@@ -76,7 +101,7 @@ time() . "_" .
 basename($_FILES["archivo"]["name"]);
 
 $rutaFisica =
-__DIR__ . "/uploads/" .
+$subidasCarpeta . "/" .
 $nombreArchivo;
 
 if(!move_uploaded_file(
@@ -88,12 +113,10 @@ if(!move_uploaded_file(
 }
 
 $estudiantes[] = [
-
     "nombre" => $nombre,
     "documento" => $documento,
     "correo" => $correo,
     "fecha" => date("Y-m-d H:i:s")
-
 ];
 
 $resultadoEstudiantes = file_put_contents(
@@ -115,10 +138,8 @@ if(!is_array($documentos))
 }
 
 $documentos[] = [
-
     "documento" => $documento,
     "archivo" => $nombreArchivo
-
 ];
 
 $resultadoDocumentos = file_put_contents(
