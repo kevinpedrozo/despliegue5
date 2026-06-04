@@ -3,19 +3,35 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Definimos la ruta en la carpeta temporal para evitar problemas de permisos
 $archivo = sys_get_temp_dir() . "/estudiantes.json";
 
-if (!file_exists($archivo)) {
-    file_put_contents($archivo, "[]");
-}
-
-if (!file_exists($archivo))
-{
-    die("<div style='font-family:system-ui; max-width:500px; margin:50px auto; padding:20px; background:#fef2f2; border:1px solid #fca5a5; color:#991b1b; border-radius:8px; text-align:center;'><h2>❌ No existe estudiantes.json</h2></div>");
+// Si el archivo no existe, está vacío o solo contiene "[]", cargamos los registros iniciales
+if (!file_exists($archivo) || empty(file_get_contents($archivo)) || file_get_contents($archivo) === "[]") {
+    $datosInicialesEstudiantes = [
+        [
+            "nombre" => "Carlos Mendoza",
+            "documento" => "10203040",
+            "correo" => "carlos.mendoza@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ],
+        [
+            "nombre" => "Ana Maria Restrepo",
+            "documento" => "50607080",
+            "correo" => "ana.restrepo@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ],
+        [
+            "nombre" => "Laura Sofia Gomez",
+            "documento" => "90807060",
+            "correo" => "laura.gomez@email.com",
+            "fecha" => date("Y-m-d H:i:s")
+        ]
+    ];
+    file_put_contents($archivo, json_encode($datosInicialesEstudiantes, JSON_PRETTY_PRINT));
 }
 
 $contenido = file_get_contents($archivo);
-
 $estudiantes = json_decode($contenido, true);
 
 if (!is_array($estudiantes))
