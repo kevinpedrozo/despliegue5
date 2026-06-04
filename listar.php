@@ -1,31 +1,70 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 $archivo = "estudiantes.json";
 
-echo "<h3>Archivo: $archivo</h3>";
-
-if (!file_exists($archivo)) {
-    die("❌ No existe estudiantes.json");
+if(!file_exists($archivo))
+{
+    die("No existen estudiantes registrados");
 }
 
-$contenido = file_get_contents($archivo);
+$estudiantes = json_decode(
+file_get_contents($archivo),
+true
+);
 
-echo "<h3>Contenido:</h3>";
-echo "<pre>";
-echo htmlspecialchars($contenido);
-echo "</pre>";
+?>
 
-$estudiantes = json_decode($contenido, true);
+<!DOCTYPE html>
+<html lang="es">
 
-echo "<h3>Total registros: " . count($estudiantes) . "</h3>";
+<head>
+<meta charset="UTF-8">
+<title>Listado</title>
+</head>
 
-foreach ($estudiantes as $e) {
-    echo "<p>";
-    echo $e['nombre'] . " - ";
-    echo $e['documento'] . " - ";
-    echo $e['correo'];
-    echo "</p>";
+<body>
+
+<h1>📋 Estudiantes Registrados</h1>
+
+<table border="1" cellpadding="10">
+
+<tr>
+<th>Nombre</th>
+<th>Documento</th>
+<th>Correo</th>
+<th>Fecha</th>
+</tr>
+
+<?php
+
+foreach($estudiantes as $e)
+{
+    echo "
+
+    <tr>
+
+    <td>{$e['nombre']}</td>
+
+    <td>{$e['documento']}</td>
+
+    <td>{$e['correo']}</td>
+
+    <td>{$e['fecha']}</td>
+
+    </tr>
+
+    ";
 }
+
+?>
+
+</table>
+
+<br>
+
+<a href="index.php">
+🏠 Volver
+</a>
+
+</body>
+</html>
